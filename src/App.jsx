@@ -1,25 +1,34 @@
-import MainSection from "./components/MainSection";
-import Navbar from "./components/Navbar";
-import Sidebar from "./components/Sidebar";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+import { Routes, Route, Navigate, Outlet, useNavigate } from "react-router-dom"
+import Home from "./components/Home";
+import Login from "./components/Login";
+import { getAccessToken, setToken } from "./redux/APISlice";
+import RecentlyPlayed from "./components/RecentlyPlayed";
+
+
 
 function App() {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+
+    dispatch(getAccessToken());
+
+  }, []);
+
+
+
   return (
-    <div className="grid place-items-center h-screen bg-[#3ABB82] text-white">
-      {/* Main Container Body */}
-      <div className="mr-2 md:w-[72%] md:h-[90%] w-[95%] h-[98%] md:rounded-sm bg-white text-black flex" style={{"box-shadow": " rgba(0, 0, 0, 0.15) 2.4px 2.4px 3.2px"}}>
-        {/* SideBar */}
-        <Sidebar />
+    <>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/home" element={<Home />} />
+        <Route path="/recent" element={<RecentlyPlayed />}/>
+      </Routes>
 
-        <div className="bg-gradient-to-t from-[#ECDBFD] via-[#FCF3F8] to-[#FFEEDE] h-fit w-fit">
-          {/* Navbar */}
-          <Navbar />
-
-          {/* Main Section */}
-          <MainSection />
-
-        </div>
-      </div>
-    </div>
+    </>
   );
 }
 

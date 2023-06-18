@@ -1,12 +1,15 @@
-import React from 'react'
-import Player from './Player'
+import React, { useEffect, useState } from 'react'
 import Queue from './Queue'
+import Embed from './Embed'
+import { useSelector } from 'react-redux';
 
 function BottomSection() {
   return (
-    <div className='lg:flex gap-2'>
+    <div className='lg:flex justify-between gap-2'>
       {/* Player */}
-      <Player />
+      {/* <Player /> */}
+      <Embed/>
+      {/* Mostly Played */}
       <Queue />
     </div>
   )

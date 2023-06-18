@@ -1,19 +1,154 @@
-import React from 'react'
+import { Tooltip, Modal, Box, Typography, Card, CardMedia, Button, CardContent, CardActions, IconButton, Menu, MenuItem, Snackbar, Alert } from "@mui/material";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { loadPlaySong, loadSong } from "../redux/APISlice";
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 
-function ArtistCard() {
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
+  bgcolor: 'background.paper',
+  border: '1px solid gray',
+  boxShadow: 24,
+  p: 0,
+};
+
+function ArtistCard(props) {
+  const dispatch = useDispatch();
+  const token = useSelector(state => state.APISlice.token);
+
+
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [alertopen, setAlertOpen] = useState(false);
+  const openMenu = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const alertclose = () => {
+    setAlertOpen(false);
+  }
+
+  const handleCloseMenu = async (id) => {
+    var payload = {
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({
+        uris: [
+          props.uri.uri
+        ],
+        position: 0
+      })
+    }
+
+    const endpoint = `https://api.spotify.com/v1/playlists/${id}/tracks`;
+    const res = await fetch(endpoint, payload);
+    if (res.ok) {
+      setAlertOpen(true);
+    }
+    else {
+      alert(res.statusText);
+    }
+
+    setAnchorEl(null);
+  };
+
+
+
+
   return (
     <div className='space-y-3 w-[180px]'>
       {/* Image div */}
-      <div className='rounded-lg w-[80%] hover:cursor-pointer bg-transparent'>
-        <img className='object-contain rounded-lg hover:shadow-xl hover:scale-105 md:hover:transition-transform  duration-300 ease-in-out ' src="https://is2-ssl.mzstatic.com/image/thumb/Music122/v4/d9/5d/ab/d95dabba-1407-e018-4322-1b81f3541d9f/21UM1IM14479.rgb.jpg/400x400cc.jpg" alt="coverart" />
+      <div className='rounded-lg w-[85px] hover:cursor-pointer bg-transparent'>
+        <img onClick={handleOpen} className='object-contain rounded-lg hover:shadow-xl hover:scale-105 md:hover:transition-transform  duration-300 ease-in-out ' src={props.cover} alt="coverart" />
       </div>
+
+      <Modal
+        open={open}
+        onClose={handleClose}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <div className="w-full h-full">
+            {/* <img src={props.cover} alt="fullcover" className="object-contain w-full h-full" /> */}
+            <Card>
+              <CardMedia
+                component="img"
+                alt="green iguana"
+                height="100"
+                style={{ objectFit: 'cover' }}
+                image={props.cover}
+              />
+              <CardContent>
+                <p>
+                  {props.name}
+                </p>
+                <Typography variant="body2" color="text.secondary">
+                  {props.artist}
+                </Typography>
+              </CardContent>
+              <CardActions>
+                <Button onClick={() => { dispatch(loadPlaySong([props.uri])); handleClose(); }} variant="contained" color="secondary" size="small">Play</Button>
+                <Button onClick={() => window.open(props.uri.external_urls.spotify, '_blank')} variant="contained" color="secondary" size="small">Open in Spotify</Button>
+                {props.type === 'track' &&
+                  <Tooltip title="Add to a playlist" placement="top">
+                    <IconButton>
+                      <PlaylistAddIcon onClick={handleClick} />
+                    </IconButton>
+                  </Tooltip>
+                }
+              </CardActions>
+
+              <Menu
+                id="basic-menu"
+                anchorEl={anchorEl}
+                open={openMenu}
+                onClose={() => setAnchorEl(null)}
+                MenuListProps={{
+                  'aria-labelledby': 'basic-button',
+                }}
+              >
+                {props.playlists.map((item, id) => {
+                  return <MenuItem key={id} onClick={() => handleCloseMenu(item.id, item.name)}>{item.name}</MenuItem>
+                })}
+
+              </Menu>
+
+            </Card>
+
+
+          </div>
+        </Box>
+      </Modal>
+
 
       {/* Album name and Artist name  div*/}
-      <div className='space-y-1'>
-        <h1 className='text-[12px] font-bold whitespace-nowrap overflow-hidden text-ellipsis'>Miss Independent</h1>
-        <p className='text-[11px] font-semibold text-slate-500 whitespace-nowrap overflow-hidden text-ellipsis'>Ne-Yo</p>
+      <div className='space-y-1 w-[120px]'>
+        <Tooltip title={props.name}>
+          <h1 className='text-[12px] font-bold whitespace-nowrap overflow-hidden text-ellipsis hover:cursor-default'>{props.name}</h1>
+        </Tooltip>
+
+        <Tooltip title={props.artist}>
+          <p className='text-[11px] font-semibold text-slate-500 whitespace-nowrap overflow-hidden text-ellipsis hover:cursor-default'>{props.artist}</p>
+        </Tooltip>
       </div>
 
+      <Snackbar open={alertopen} autoHideDuration={6000} onClose={alertclose} >
+        <Alert onClose={alertclose} severity="success" sx={{ width: '100%' }}>
+          {`Song added to playlist`}
+        </Alert>
+      </Snackbar>
     </div>
   )
 }
