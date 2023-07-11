@@ -1,8 +1,10 @@
-import { Tooltip, Modal, Box, Typography, Card, CardMedia, Button, CardContent, CardActions, IconButton, Menu, MenuItem, Snackbar, Alert } from "@mui/material";
+import { Tooltip, Modal, Box, Typography, Card, CardMedia, Button, CardContent, CardActions, IconButton, Menu, MenuItem, Snackbar, Alert, Icon } from "@mui/material";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { loadPlaySong, loadSong } from "../redux/APISlice";
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
+import AudiotrackIcon from '@mui/icons-material/Audiotrack';
+import AlbumIcon from '@mui/icons-material/Album';
 
 const style = {
   position: 'absolute',
@@ -11,7 +13,6 @@ const style = {
   transform: 'translate(-50%, -50%)',
   width: 400,
   bgcolor: 'background.paper',
-  border: '1px solid gray',
   boxShadow: 24,
   p: 0,
 };
@@ -87,7 +88,7 @@ function ArtistCard(props) {
                 component="img"
                 alt="green iguana"
                 height="100"
-                style={{ objectFit: 'cover' }}
+                style={{ objectFit: 'contain', borderRadius: 0 }}
                 image={props.cover}
               />
               <CardContent>
@@ -97,14 +98,15 @@ function ArtistCard(props) {
                 <Typography variant="body2" color="text.secondary">
                   {props.artist}
                 </Typography>
+              
               </CardContent>
               <CardActions>
                 <Button onClick={() => { dispatch(loadPlaySong([props.uri])); handleClose(); }} variant="contained" color="secondary" size="small">Play</Button>
                 <Button onClick={() => window.open(props.uri.external_urls.spotify, '_blank')} variant="contained" color="secondary" size="small">Open in Spotify</Button>
                 {props.type === 'track' &&
                   <Tooltip title="Add to a playlist" placement="top">
-                    <IconButton>
-                      <PlaylistAddIcon onClick={handleClick} />
+                    <IconButton onClick={handleClick}>
+                      <PlaylistAddIcon />
                     </IconButton>
                   </Tooltip>
                 }
@@ -138,10 +140,17 @@ function ArtistCard(props) {
         <Tooltip title={props.name}>
           <h1 className='text-[12px] font-bold whitespace-nowrap overflow-hidden text-ellipsis hover:cursor-default'>{props.name}</h1>
         </Tooltip>
-
+        
+        <div className="flex gap-5 items-center">
         <Tooltip title={props.artist}>
           <p className='text-[11px] font-semibold text-slate-500 whitespace-nowrap overflow-hidden text-ellipsis hover:cursor-default'>{props.artist}</p>
         </Tooltip>
+
+        {props.type === "track" ? 
+        <AudiotrackIcon fontSize="small" style={{width: 17}} className="text-slate-500"/> : 
+        <AlbumIcon fontSize="small" style={{width: 17}} className="text-slate-500"/>}
+        
+        </div>
       </div>
 
       <Snackbar open={alertopen} autoHideDuration={6000} onClose={alertclose} >

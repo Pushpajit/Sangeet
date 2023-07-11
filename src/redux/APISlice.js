@@ -2,7 +2,8 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 
 
-export const getAccessToken = createAsyncThunk('accesstoken/fetch', async () => {
+export const getAccessToken = createAsyncThunk('accesstoken/fetch', async (CID) => {
+    console.log("getAccessToken runn");
     // Check if it stored into database or not and expired or not.
     if (localStorage.hasOwnProperty("token")) {
         const token = JSON.parse(localStorage.getItem("token"));
@@ -13,7 +14,7 @@ export const getAccessToken = createAsyncThunk('accesstoken/fetch', async () => 
     }
 
     // Initializing client details.
-    const CLIENT_ID = '3b3c5d0e0dfd45e9a9358944b4d61e6e';
+    const CLIENT_ID = CID === 'admin' ? '3b3c5d0e0dfd45e9a9358944b4d61e6e' : CID;
     const redirectURL = 'http://localhost:3000/login';
     const scopes = [
         'user-read-playback-state',
@@ -74,7 +75,8 @@ const APISlice = createSlice({
         status: 'idle',
         error: null,
         market: '',
-        searchSong: null
+        searchSong: null,
+        openDrawer: false
     },
 
     reducers: {
@@ -130,6 +132,10 @@ const APISlice = createSlice({
 
         setTotalPlaylist: (state, action) => {
             state.totalPlaylist = state.totalPlaylist + 1;
+        },
+
+        setOpenDrawer: (state, action) => {
+            state.openDrawer = action.payload;
         }
 
     },
@@ -170,4 +176,4 @@ const APISlice = createSlice({
 
 
 export default APISlice.reducer;
-export const { loadSong, setMarket, setSearch, loadToken, setToken, loadPlaySong, setPlaylists, setTotalPlaylist } = APISlice.actions;
+export const { loadSong, setMarket, setSearch, loadToken, setToken, loadPlaySong, setPlaylists, setTotalPlaylist, setOpenDrawer } = APISlice.actions;

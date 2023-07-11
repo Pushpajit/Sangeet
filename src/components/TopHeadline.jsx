@@ -64,13 +64,14 @@ function TopHeadline() {
         else {
             // alert(res.statusText);
             localStorage.removeItem('token');
+            // localStorage.removeItem('user');
             navigate("/login");
         }
 
     }
 
     // Call api new release whenever the dependency 'filter' changes.
-    const [filter, setFilter] = useState({ market: 'US', limit: 20 });
+    const [filter, setFilter] = useState({ market: 'IN', limit: 20 });
 
     useEffect(() => {
 
@@ -144,7 +145,7 @@ function TopHeadline() {
 
 
     return (
-        <section className='space-y-3 '>
+        <section className='space-y-3 w-full lg:w-[1200px]'>
             {/* Top bar */}
             <div className='flex justify-between'>
                 <div className='flex gap-5 items-center'>
@@ -212,7 +213,7 @@ function TopHeadline() {
             </div>
 
             {/* Bottom Artist Cards */}
-            <div ref={scrollRef} className='md:flex md:h-fit md:flex-nowrap flex gap-5 overflow-x-scroll pt-2 pl-6 pr-2 rounded-md' style={{ "scrollbarWidth": "thin", "scrollbarColor": "transparent transparent", "boxShadow": "inset -10px 0 10px -10px rgba(0, 0, 0, 0.25),inset 10px 0 10px -10px rgba(0, 0, 0, 0.25)" }}>
+            <div ref={scrollRef} className='scroll-container md:flex md:h-fit md:w-full md:flex-nowrap flex gap-5 overflow-x-scroll pt-2 pl-6 pr-2 rounded-md' style={{ "scrollbarWidth": "thin", "scrollbarColor": "transparent transparent"}}>
                 {search === null ? newAlbum.map((item, ind) => {
                     return <ArtistCard cover={item.images.length === 0 ? 'https://images.pexels.com/photos/2746823/pexels-photo-2746823.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2' : item.images[0].url} name={item.name} artist={item.artists[0].name} key={ind} uri={item} type={item.type} playlists={playlists} />
 

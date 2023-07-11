@@ -54,7 +54,7 @@ function SongCard({ id, name, artist, duration, pic, isPlaying, uri, type, playl
     var seconds = Math.floor((duration % (1000 * 60)) / 1000);
 
     return (
-        <div className=''>
+        <div>
             <Paper elevation={1} style={{ height: 62, padding: 5, width: '100%', display: 'flex', alignItems: 'center' }} className='hover:cursor-pointer md:hover:transition-colors duration-300 ease-in-out hover:bg-gray-100 flex items-center gap-2'>
                 <p className='text-[12px] font-semibold text-slate-700'>{id.toString().padStart(2, '0')}</p>
 
@@ -72,8 +72,8 @@ function SongCard({ id, name, artist, duration, pic, isPlaying, uri, type, playl
                 </div>
                 {type === 'track' &&
                     <Tooltip title="Add to a playlist" placement="top">
-                        <IconButton>
-                            <PlaylistAddIcon fontSize='small' onClick={handleClick} />
+                        <IconButton onClick={handleClick}>
+                            <PlaylistAddIcon fontSize='small'  />
                         </IconButton>
                     </Tooltip>
                 }

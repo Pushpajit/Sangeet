@@ -3,17 +3,19 @@ import { FaHome, FaFolderOpen } from 'react-icons/fa';
 import { BiGridAlt } from 'react-icons/bi';
 import { BsFillPersonFill, BsFillCameraVideoFill, BsFillFileEarmarkMusicFill } from 'react-icons/bs';
 import { MdTimer } from 'react-icons/md';
-import { Avatar, Box, Button, Divider, FormControlLabel, IconButton, List, ListItem, ListItemButton, Modal, Switch, TextField, Tooltip, Typography } from '@mui/material';
+import { Avatar, Box, Button, Divider, Drawer, FormControlLabel, IconButton, List, ListItem, ListItemButton, Modal, Switch, TextField, Tooltip, Typography, useMediaQuery } from '@mui/material';
 import PlaylistPlayIcon from '@mui/icons-material/PlaylistPlay';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { loadPlaySong, setTotalPlaylist } from '../redux/APISlice';
+import { loadPlaySong, setOpenDrawer, setTotalPlaylist } from '../redux/APISlice';
 import AddIcon from '@mui/icons-material/Add';
+import { useTheme } from '@mui/material/styles';
+import CloseIcon from '@mui/icons-material/Close';
 
 
 const style = {
     position: 'absolute',
-    top: '50%',
+    top: '40%',
     left: '50%',
     transform: 'translate(-50%, -50%)',
     width: 400,
@@ -41,7 +43,7 @@ function Sidebar() {
 
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
-    
+
     async function getCurrentUserSavedSong() {
         var payload = {
             method: 'GET',
@@ -63,7 +65,7 @@ function Sidebar() {
             navigate("/login");
         }
     }
-    
+
     async function getUserPlaylist() {
         var payload = {
             method: 'GET',
@@ -86,7 +88,7 @@ function Sidebar() {
 
     }
 
-    async function getUserID(){
+    async function getUserID() {
         var payload = {
             method: 'GET',
             headers: {
@@ -94,17 +96,17 @@ function Sidebar() {
                 'Authorization': 'Bearer ' + token
             }
         }
-        
+
         const endpoint = 'https://api.spotify.com/v1/me';
 
         const res = await fetch(endpoint, payload);
-        
-        if(res.ok){
+
+        if (res.ok) {
             const data = await res.json();
             console.log(data);
             return data.id;
         }
-        else{
+        else {
             alert(res.statusText);
             return '';
         }
@@ -128,7 +130,7 @@ function Sidebar() {
         const endpoint = `https://api.spotify.com/v1/users/${user_id}/playlists`;
 
         const res = await fetch(endpoint, payload);
-        
+
         dispatch(setTotalPlaylist());
         alert(res.statusText);
 
@@ -153,7 +155,7 @@ function Sidebar() {
             })
         }
     }
-    
+
     const handleClose = async () => {
         if (createPlaylistData.name === '') {
             document.getElementById('name').focus();
@@ -173,22 +175,31 @@ function Sidebar() {
         setErr(false);
     }
 
-    
+
     useEffect(() => {
         if (status === 'success') {
-            // getCurrentUserSavedSong();
             getUserPlaylist();
         }
     }, [status, totalPlaylist])
 
 
-    // console.log("playlist: ", playlists);
+
+    const theme = useTheme();
+    const isMidScreen = useMediaQuery(theme.breakpoints.down("md"));
+    const openDrawer = useSelector(state => state.APISlice.openDrawer);
+    
 
 
 
 
     return (
-        <section className='w-[19%] p-5  text-xs font-semibold hidden lg:block ' >
+
+
+        <section className= {`lg:w-[19%] p-5 text-xs font-semibold lg:block ${isMidScreen && openDrawer ? 'fixed' : 'hidden'} md:top-0 md:left-0 bg-white md:w-fit ${isMidScreen && 'z-30'}`} >
+            
+            {isMidScreen && <IconButton onClick={(e) => {dispatch(setOpenDrawer(false))}} className='fixed -top-4 left-36'>
+                <CloseIcon fontSize='small'/>
+            </IconButton>}
             {/* Top Menu */}
             <div className='space-y-3 mb-10'>
                 <div onClick={() => navigate("/home")} className='sidebtn flex items-center gap-3 hover:text-[#F96071] hover:cursor-pointer md:hover:transition-colors duration-300 ease-in-out '>
@@ -241,14 +252,16 @@ function Sidebar() {
                         </IconButton >
                     </Tooltip>
                 </div>
-                <div className='w-[180px] hover:cursor-pointer font-semibold text-[13px] overflow-y-scroll h-[220px]' style={{ "scrollbarWidth": "none" }}>
 
+                <div className=' scroll-container w-[180px] hover:cursor-pointer font-semibold text-[13px] overflow-y-scroll h-[270px]' style={{scrollbarWidth: "none"}}>
+
+                    {/* All available playlists of current user */}
                     {playlists.map((item, ind) => {
                         return <List key={ind} >
                             <ListItem disablePadding >
                                 <ListItemButton style={{ display: 'flex', justifyContent: 'space-between', padding: 1, paddingTop: 2, paddingBottom: 2 }}>
                                     <div className='flex justify-center items-center gap-2'>
-                                        <Avatar variant='square' style={{ width: 32, height: 32 }} src={item.images.length !== 0 ? item.images[0].url: ''}>
+                                        <Avatar variant='square' style={{ width: 32, height: 32 }} src={item.images.length !== 0 ? item.images[0].url : ''}>
 
                                         </Avatar>
                                         <p>{item.name}</p>
@@ -265,6 +278,7 @@ function Sidebar() {
                 </div>
             </div>
 
+            {/* Create new playlist Modal */}
             <Modal
                 open={open}
                 onClose={() => {
@@ -281,13 +295,14 @@ function Sidebar() {
             >
                 <Box sx={style} className='space-y-3'>
                     <p className='text-center mb-3 font-bold text-slate-700'>Create New Playlist</p>
-                    <TextField id='name' onChange={handleChange} label="Playlist Name" variant="outlined" color={err ? 'error' : 'success'} size='small' style={{ width: "100%" }} helperText={err ? 'Atleast give a name.': ''} />
+                    <TextField id='name' onChange={handleChange} label="Playlist Name" variant="outlined" color={err ? 'error' : 'success'} size='small' style={{ width: "100%" }} helperText={err ? 'Atleast give it a name.' : ''} />
                     <TextField id='desc' onChange={handleChange} label="Description" variant="outlined" color='success' multiline style={{ width: "100%" }} />
                     <FormControlLabel className='text-slate-700' control={<Switch id='check' color='success' onChange={handleChange} />} label={createPlaylistData.public ? 'Public' : 'Private'} />
                     <Button onClick={handleClose} className='float-right' color='success' size='small' variant="outlined">create</Button>
                 </Box>
             </Modal>
         </section>
+
     )
 }
 

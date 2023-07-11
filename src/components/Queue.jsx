@@ -51,7 +51,8 @@ function Queue() {
     }
     else {
       alert(res.statusText);
-      // localStorage.removeItem('token');
+      localStorage.removeItem('token');
+      // localStorage.removeItem('user');
       // navigate("/login");
     }
 
@@ -84,12 +85,12 @@ function Queue() {
       mostPlaySongs();
       getUserPlaylist();
     }
-  }, [totalPlaylist])
+  }, [totalPlaylist, mostPlayed])
 
   // console.log("total playlists: ", totalPlaylist);
 
   return (
-    <div className='w-[50%] space-y-3 mb-3'>
+    <div className='lg:w-[85%] md:w-[100%] space-y-3 mb-3'>
       {/* Top section */}
       <div className='flex justify-between items-center gap-5'>
         <p className='ml-1 font-bold text-base text-slate-700'>Mostly Played</p>
@@ -106,7 +107,7 @@ function Queue() {
       </div>
 
       {/* Bottom section MUI papers */}
-      <div ref={scrollContainerRef} className='h-[282px] overflow-y-scroll space-y-2 p-1' style={{ "scrollbarWidth": "thin", "scrollbarColor": "transparent transparent" }}>
+      <div ref={scrollContainerRef} className='scroll-container h-[305px] overflow-y-scroll space-y-3 p-1' style={{ "scrollbarWidth": "thin", "scrollbarColor": "transparent transparent" }}>
         {mostPlayed.map((item, index) => <SongCard key={index} id={index + 1} name={item.name} pic={item.album.images[0].url} duration={item.duration_ms} isPlaying={true} uri={item} type={item.type} playlist={playlists} />)}
       </div>
     </div>

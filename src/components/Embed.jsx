@@ -1,6 +1,7 @@
-import { Card, CardActionArea } from '@mui/material';
+import { Card, CardActionArea, useMediaQuery } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
+import { useTheme } from '@mui/material/styles';
 
 function Embed() {
     const playsongs = useSelector(state => state.APISlice.playsongs);
@@ -25,19 +26,25 @@ function Embed() {
 
     }, [playsongs])
 
+    // useMediaQuerry for dynamic size
+    const theme = useTheme();
+    const isMidScreen = useMediaQuery(theme.breakpoints.down('lg')); 
+
     
 
     // Setting up the embed URL
-    var src = `https://open.spotify.com/embed/${newSongs[index].type}/${newSongs[index].uri}?utm_source=oembed&autoplay=true`;
+    var src = `https://open.spotify.com/embed/${newSongs[index].type}/${newSongs[index].uri}?utm_source=oembed`;
 
     return (
-            <div className=''>
+            <div className='md:mb-5 md:pr-3'>
                 <p className='ml-1 font-bold text-base mt-1 text-slate-700'>Now Playing</p>
-                <Card style={{padding: 0, width: "400px", height: "275px", marginTop: 25, borderTopRightRadius: 10, borderTopLeftRadius: 10}}>
+                <Card style={{padding: 0, width: isMidScreen ? "100%" : "480px", height: "288px", marginTop: 25, borderRadius: 10}}>
 
-                    <iframe 
+                    <iframe
+                    title='OEmbed' 
                     width="100%"
-                    height='200'
+                    // height={isMidScreen ? "400" : "200"}
+                    height="350"
                     style={{"border-radius": "12px", "marginTop": "5px", "opacity": "1"}} 
                     frameborder="0"
                     allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"

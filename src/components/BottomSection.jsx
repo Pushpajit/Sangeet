@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux';
 
 function BottomSection() {
   return (
-    <div className='lg:flex justify-between gap-2'>
+    <div className='lg:flex gap-5 lg:pb-3'>
       {/* Player */}
       {/* <Player /> */}
       <Embed/>
